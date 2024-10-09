@@ -8,6 +8,8 @@
         $(`#increment-qty_${itemId}`).prop('disabled', plusDisabled);
     }
 
+    var allQtyInputs
+
     $('.increment-qty').click(function(e) {
         e.preventDefault();
         var closestInput = $(this).closest('.input-group').find('.qty_input')[0];
