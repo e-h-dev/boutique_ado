@@ -1,4 +1,5 @@
-from django.shortcuts import render, redirect, reverse, get_object_or_404
+from django.shortcuts import render, redirect, reverse, get_object_or_404, HttpResponse
+from django.views.decorators.http import require_POST
 from django.contrib import messages
 from django.conf import settings
 
@@ -8,6 +9,25 @@ from products.models import Product
 from bag.context import bag_contents
 
 import stripe
+import json
+
+# not activated part of web hook section
+@require_POST
+def cache_checkout_data(request):
+    try:
+        pid = request.POST.get('client_secret').split('_secret')[0]
+        stripe.api_key = settings.STRIPE_SECRET_KEY
+        stripe.PaymentIntent.modify(pid, metadata={
+            'bag' :json.dumps(request.session.get('bag', {})),
+            'save_info': requst.POST.et('save_info'),
+            'usename': request.user,
+        })
+        return HttpResponse(status=200)
+    except Exception as e:
+        messages.error(request, 'Sorry, your payment cannot be \
+            processed now. Please try again later')
+        return HttpResponse(content=e, status=404)
+   # end webhook section 
 
 
 def checkout(request):
